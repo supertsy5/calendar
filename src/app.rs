@@ -1,4 +1,4 @@
-use std::{rc::Rc, str::FromStr};
+use std::rc::Rc;
 
 use chrono::{Datelike, Local, Month, NaiveDate, Weekday};
 use nongli::{
@@ -7,8 +7,15 @@ use nongli::{
     iter::{Months, Weekdays},
     language::{Language, ShortTranslate, Translate},
 };
-use web_sys::{wasm_bindgen::JsCast, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
+
+use crate::form::{CheckboxInput, Form, IntInput, Select, SelectOption};
+
+const LANGUAGES: [Language; 3] = [
+    Language::English,
+    Language::ChineseSimplified,
+    Language::ChineseTraditional,
+];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct YearMonth {
@@ -129,12 +136,14 @@ pub fn app() -> Html {
     });
     let active_dialog = use_reducer_eq(|| ActiveDialog(None));
 
-    let language = use_state_eq(|| Language::English);
+    let language_index = use_state_eq(|| 0u32);
     let enable_chinese = use_state_eq(|| false);
     let start_on_monday = use_state_eq(|| false);
     let highlight_today = use_state_eq(|| true);
+
+    let language = LANGUAGES.get(*language_index as usize).copied().unwrap_or(Language::English);
     let options = Options {
-        language: *language,
+        language,
         enable_chinese: *enable_chinese,
         start_on_monday: *start_on_monday,
         color: false,
@@ -164,7 +173,7 @@ pub fn app() -> Html {
     let active_dialog_dispatcher1 = active_dialog.dispatcher();
     let active_dialog_dispatcher2 = active_dialog.dispatcher();
 
-    let language_setter = language.setter();
+    let language_setter = language_index.setter();
     let enable_chinese_setter = enable_chinese.setter();
     let start_on_monday_setter = start_on_monday.setter();
     let highlight_today_setter = highlight_today.setter();
@@ -175,8 +184,8 @@ pub fn app() -> Html {
                 <div class="side left">{ year_month.month.name() }</div>
                 <div class="year">{ year_month.year }</div>
                 <div class="side right">
-                    if *language != Language::English {
-                        { year_month.month.translate_to_string(*language) }
+                    if language != Language::English {
+                        { year_month.month.translate_to_string(language) }
                     }
                 </div>
             </div>
@@ -187,7 +196,7 @@ pub fn app() -> Html {
                             .take(7)
                             .map(|weekday| html! {
                                 <th class={classes!(is_weekend(weekday).then_some("weekend"))}>
-                                    { weekday.short().translate_to_string(*language) }
+                                    { weekday.short().translate_to_string(language) }
                                 </th>
                             })
                     }</tr>
@@ -204,13 +213,13 @@ pub fn app() -> Html {
                                                 <div class="day">{ cell.date.day() }</div>
                                                 if let Some(solar_term) = cell.solar_term {
                                                     <div class="chinese solar-term">{
-                                                        solar_term.translate_to_string(*language)
+                                                        solar_term.translate_to_string(language)
                                                     }</div>
                                                 } else if let Some(chinese) = cell.chinese_date {
                                                     <div class="chinese">{
                                                         chinese
                                                             .short()
-                                                            .translate_to_string(*language)
+                                                            .translate_to_string(language)
                                                     }</div>
                                                 }
                                             </td>
@@ -230,167 +239,70 @@ pub fn app() -> Html {
                 match dialog {
                     Dialog::Jump => html! { <div class="dialog">
                         <div class="title">{"Jump"}</div>
-                        <table>
-                            <tr>
-                                <td>{"Year"}</td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={ year_month.year.to_string() }
-                                        min="-262143"
-                                        max="262142"
-                                        onchange={ move |event: Event| {
-                                            let Some(element) = event.target().and_then(|target| {
-                                                target.dyn_into::<HtmlInputElement>().ok()
-                                            }) else {
-                                                return;
-                                            };
-                                            let Ok(year) = i32::from_str(&element.value()) else {
-                                                return;
-                                            };
-                                            year_month_dispatcher3.dispatch(
-                                                YearMonthAction::SetYear(year)
-                                            );
-                                        }}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{"Month"}</td>
-                                <td>
-                                    <select
-                                        onchange={ move |event: Event| {
-                                            let Some(element) = event.target().and_then(|target| {
-                                                target.dyn_into::<HtmlSelectElement>().ok()
-                                            }) else {
-                                                return;
-                                            };
-                                            year_month_dispatcher4.dispatch(
-                                                YearMonthAction::SetMonth(
-                                                    Month::try_from(
-                                                        element.selected_index() as u8 + 1
-                                                    ).unwrap()
-                                                )
-                                            );
-                                        } }
-                                    >{
-                                        for Months(Month::January).take(12).map(|month| html! {
-                                            <option selected={ month == year_month.month }>
-                                                { month.translate_to_string(*language) }
-                                            </option>
-                                        })
-                                    }</select>
-                                </td>
-                            </tr>
-                        </table>
+                        <Form>
+                            <IntInput
+                                name="Year"
+                                min={ Some(-262143) }
+                                max={ Some(262142) }
+                                value={ year_month.year }
+                                onchange={ move |value| {
+                                    year_month_dispatcher3
+                                        .dispatch(YearMonthAction::SetYear(value));
+                            } }/>
+                            <Select
+                                name="Month"
+                                value={ year_month.month as u32 }
+                                onchange={move |value| {
+                                    if let Ok(month) = Month::try_from(value as u8 + 1) {
+                                        year_month_dispatcher4.dispatch(
+                                            YearMonthAction::SetMonth(month)
+                                        );
+                                    }
+                                }}
+                            >
+                            {
+                                for Months(Month::January).take(12).map(|month| html_nested! {
+                                    <SelectOption>
+                                        { month.translate_to_string(language) }
+                                    </SelectOption>
+                                })
+                            }
+                            </Select>
+                        </Form>
                     </div> },
                     Dialog::Styles => html! {<div class="dialog">
                         <div class="title">{"Styles"}</div>
-                        <table></table>
+                        <Form>
+                        </Form>
                     </div> },
                     Dialog::Settings => html! { <div class="dialog">
                         <div class="title">{"Settings"}</div>
-                        <table>
-                            <tr>
-                                <td>{"Language"}</td>
-                                <td>
-                                    <select
-                                        onchange={ move |event: Event| {
-                                            use Language::*;
-                                            let Some(element) = event
-                                                .target()
-                                                .and_then(|target| {
-                                                    target.dyn_into::<HtmlSelectElement>().ok()
-                                                })
-                                            else {
-                                                return;
-                                            };
-                                            language_setter.set(
-                                                [
-                                                    English,
-                                                    ChineseSimplified,
-                                                    ChineseTraditional,
-                                                ][element.selected_index() as usize]
-                                            );
-                                        }}
-                                    >
-                                        <option selected={ *language == Language::English }>
-                                            {"English"}
-                                        </option>
-                                        <option
-                                            selected={ *language == Language::ChineseSimplified }
-                                        >
-                                            {"简体中文"}
-                                        </option>
-                                        <option
-                                            selected={ *language == Language::ChineseTraditional }
-                                        >
-                                            {"繁體中文"}
-                                        </option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{"Enable Chinese Caldendar"}</td>
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        checked={ *enable_chinese }
-                                        onchange={ move |event: Event| {
-                                            let Some(element) = event
-                                                .target()
-                                                .and_then(|target| {
-                                                    target.dyn_into::<HtmlInputElement>().ok()
-                                                })
-                                            else {
-                                                return;
-                                            };
-                                            enable_chinese_setter.set(element.checked());
-                                        } }
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{"Start on Monday"}</td>
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        checked={ *start_on_monday }
-                                        onchange={ move |event: Event| {
-                                            let Some(element) = event
-                                                .target()
-                                                .and_then(|target| {
-                                                    target.dyn_into::<HtmlInputElement>().ok()
-                                                })
-                                            else {
-                                                return;
-                                            };
-                                            start_on_monday_setter.set(element.checked());
-                                        } }
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{"Highlight Today"}</td>
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        checked={ *highlight_today }
-                                        onchange={ move |event: Event| {
-                                            let Some(element) = event
-                                                .target()
-                                                .and_then(|target| {
-                                                    target.dyn_into::<HtmlInputElement>().ok()
-                                                })
-                                            else {
-                                                return;
-                                            };
-                                            highlight_today_setter.set(element.checked());
-                                        } }
-                                    />
-                                </td>
-                            </tr>
-                        </table>
+                        <Form>
+                            <Select
+                                name="Language"
+                                value={ *language_index }
+                                onchange={ move |value| language_setter.set(value) }
+                            >
+                                <SelectOption>{"English"}</SelectOption>
+                                <SelectOption>{"简体中文"}</SelectOption>
+                                <SelectOption>{"繁體中文"}</SelectOption>
+                            </Select>
+                            <CheckboxInput
+                                name="Enable Chinese"
+                                checked={ *enable_chinese }
+                                onchange={ move |checked| enable_chinese_setter.set(checked) }
+                            />
+                            <CheckboxInput
+                                name="Start on Monday"
+                                checked={ *start_on_monday }
+                                onchange={ move |checked| start_on_monday_setter.set(checked) }
+                            />
+                            <CheckboxInput
+                                name="Highlight Today"
+                                checked={ *highlight_today }
+                                onchange={ move |checked| highlight_today_setter.set(checked) }
+                            />
+                        </Form>
                     </div> }
                 } }
             }
