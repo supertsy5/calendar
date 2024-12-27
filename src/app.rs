@@ -9,7 +9,7 @@ use nongli::{
 };
 use yew::prelude::*;
 
-use crate::form::{CheckboxInput, Form, IntInput, Select, SelectOption, StringInput};
+use crate::form::{CheckboxInput, ColorInput, Form, IntInput, Select, SelectOption, StringInput};
 
 const LANGUAGES: [Language; 3] = [
     Language::English,
@@ -297,157 +297,156 @@ pub fn app() -> Html {
                 </table>
             </div>
         </main>
-        <div class="corner">
-            if let Some(dialog) = active_dialog_value {{
-                match dialog {
-                    Dialog::Jump => html! { <div class="dialog">
-                        <div class="title">{"Jump"}</div>
-                        <Form>
-                            <IntInput
-                                name="Year"
-                                min={ Some(-262143) }
-                                max={ Some(262142) }
-                                value={ year_month.year }
-                                onchange={ move |value| {
-                                    year_month_dispatcher3
-                                        .dispatch(YearMonthAction::SetYear(value));
-                            } }/>
-                            <Select
-                                name="Month"
-                                value={ year_month.month as u32 }
-                                onchange={move |value| {
-                                    if let Ok(month) = Month::try_from(value as u8 + 1) {
-                                        year_month_dispatcher4.dispatch(
-                                            YearMonthAction::SetMonth(month)
-                                        );
-                                    }
-                                }}
-                            >
-                            {
-                                for Months(Month::January).take(12).map(|month| html_nested! {
-                                    <SelectOption>
-                                        { month.translate_to_string(language) }
-                                    </SelectOption>
-                                })
-                            }
-                            </Select>
-                        </Form>
-                    </div> },
-                    Dialog::Styles => html! {<div class="dialog">
-                        <div class="title">{"Styles"}</div>
-                        <Form>
-                            <StringInput
-                                name="Text Color"
-                                value={ color_text.deref().clone() }
-                                onchange={ move |value| color_text_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Theme Color"
-                                value={ color_theme.deref().clone() }
-                                onchange={ move |value| color_theme_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Title Color"
-                                value={ color_title.deref().clone() }
-                                onchange={ move |value| color_title_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Today Text Color"
-                                value={ color_today_text.deref().clone() }
-                                onchange={move |value| {
-                                    color_today_text_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Weekend Color"
-                                value={ color_weekend.deref().clone() }
-                                onchange={ move |value| color_weekend_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Solar Term Color"
-                                value={ color_solar_term.deref().clone() }
-                                onchange={ move |value| {
-                                    color_solar_term_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Cell Width"
-                                value={ size_cell_width.deref().clone() }
-                                onchange={ move |value| {
-                                    size_cell_width_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Cell Height"
-                                value={ size_cell_height.deref().clone() }
-                                onchange={ move |value| {
-                                    size_cell_height_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Header Height"
-                                value={ size_header_height.deref().clone() }
-                                onchange={ {
-                                    move |value| size_header_height_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Text Size"
-                                value={ size_text.deref().clone() }
-                                onchange={ move |value| size_text_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Month Size"
-                                value={ size_text_month.deref().clone() }
-                                onchange={ move |value| {
-                                    size_text_month_setter.set(Rc::from(value))
-                                } }
-                            />
-                            <StringInput
-                                name="Year Size"
-                                value={ size_text_year.deref().clone() }
-                                onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
-                            />
-                            <StringInput
-                                name="Year Padding"
-                                value={ size_year_padding.deref().clone() }
-                                onchange={ move |value| {
-                                    size_year_padding_setter.set(Rc::from(value))
-                                } }
-                            />
-                        </Form>
-                    </div> },
-                    Dialog::Settings => html! { <div class="dialog">
-                        <div class="title">{"Settings"}</div>
-                        <Form>
-                            <Select
-                                name="Language"
-                                value={ *language_index }
-                                onchange={ move |value| language_setter.set(value) }
-                            >
-                                <SelectOption>{"English"}</SelectOption>
-                                <SelectOption>{"简体中文"}</SelectOption>
-                                <SelectOption>{"繁體中文"}</SelectOption>
-                            </Select>
-                            <CheckboxInput
-                                name="Enable Chinese"
-                                checked={ *enable_chinese }
-                                onchange={ move |checked| enable_chinese_setter.set(checked) }
-                            />
-                            <CheckboxInput
-                                name="Start on Monday"
-                                checked={ *start_on_monday }
-                                onchange={ move |checked| start_on_monday_setter.set(checked) }
-                            />
-                            <CheckboxInput
-                                name="Highlight Today"
-                                checked={ *highlight_today }
-                                onchange={ move |checked| highlight_today_setter.set(checked) }
-                            />
-                        </Form>
-                    </div> }
-                } }
-            }
+        if let Some(dialog) = active_dialog_value {{
+            match dialog {
+                Dialog::Jump => html! { <div class="dialog">
+                    <div class="title">{"Jump"}</div>
+                    <Form>
+                        <IntInput
+                            name="Year"
+                            min={ Some(-262143) }
+                            max={ Some(262142) }
+                            value={ year_month.year }
+                            onchange={ move |value| {
+                                year_month_dispatcher3
+                                    .dispatch(YearMonthAction::SetYear(value));
+                        } }/>
+                        <Select
+                            name="Month"
+                            value={ year_month.month as u32 }
+                            onchange={move |value| {
+                                if let Ok(month) = Month::try_from(value as u8 + 1) {
+                                    year_month_dispatcher4.dispatch(
+                                        YearMonthAction::SetMonth(month)
+                                    );
+                                }
+                            }}
+                        >
+                        {
+                            for Months(Month::January).take(12).map(|month| html_nested! {
+                                <SelectOption>
+                                    { month.translate_to_string(language) }
+                                </SelectOption>
+                            })
+                        }
+                        </Select>
+                    </Form>
+                </div> },
+                Dialog::Styles => html! {<div class="dialog">
+                    <div class="title">{"Styles"}</div>
+                    <Form>
+                        <ColorInput
+                            name="Text Color"
+                            value={ color_text.deref().clone() }
+                            onchange={ move |value| color_text_setter.set(Rc::from(value)) }
+                        />
+                        <ColorInput
+                            name="Theme Color"
+                            value={ color_theme.deref().clone() }
+                            onchange={ move |value| color_theme_setter.set(Rc::from(value)) }
+                        />
+                        <ColorInput
+                            name="Title Color"
+                            value={ color_title.deref().clone() }
+                            onchange={ move |value| color_title_setter.set(Rc::from(value)) }
+                        />
+                        <ColorInput
+                            name="Today Text Color"
+                            value={ color_today_text.deref().clone() }
+                            onchange={move |value| {
+                                color_today_text_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <ColorInput
+                            name="Weekend Color"
+                            value={ color_weekend.deref().clone() }
+                            onchange={ move |value| color_weekend_setter.set(Rc::from(value)) }
+                        />
+                        <ColorInput
+                            name="Solar Term Color"
+                            value={ color_solar_term.deref().clone() }
+                            onchange={ move |value| {
+                                color_solar_term_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
+                            name="Cell Width"
+                            value={ size_cell_width.deref().clone() }
+                            onchange={ move |value| {
+                                size_cell_width_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
+                            name="Cell Height"
+                            value={ size_cell_height.deref().clone() }
+                            onchange={ move |value| {
+                                size_cell_height_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
+                            name="Header Height"
+                            value={ size_header_height.deref().clone() }
+                            onchange={ {
+                                move |value| size_header_height_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
+                            name="Text Size"
+                            value={ size_text.deref().clone() }
+                            onchange={ move |value| size_text_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name="Month Size"
+                            value={ size_text_month.deref().clone() }
+                            onchange={ move |value| {
+                                size_text_month_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
+                            name="Year Size"
+                            value={ size_text_year.deref().clone() }
+                            onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name="Year Padding"
+                            value={ size_year_padding.deref().clone() }
+                            onchange={ move |value| {
+                                size_year_padding_setter.set(Rc::from(value))
+                            } }
+                        />
+                    </Form>
+                </div> },
+                Dialog::Settings => html! { <div class="dialog">
+                    <div class="title">{"Settings"}</div>
+                    <Form>
+                        <Select
+                            name="Language"
+                            value={ *language_index }
+                            onchange={ move |value| language_setter.set(value) }
+                        >
+                            <SelectOption>{"English"}</SelectOption>
+                            <SelectOption>{"简体中文"}</SelectOption>
+                            <SelectOption>{"繁體中文"}</SelectOption>
+                        </Select>
+                        <CheckboxInput
+                            name="Enable Chinese"
+                            checked={ *enable_chinese }
+                            onchange={ move |checked| enable_chinese_setter.set(checked) }
+                        />
+                        <CheckboxInput
+                            name="Start on Monday"
+                            checked={ *start_on_monday }
+                            onchange={ move |checked| start_on_monday_setter.set(checked) }
+                        />
+                        <CheckboxInput
+                            name="Highlight Today"
+                            checked={ *highlight_today }
+                            onchange={ move |checked| highlight_today_setter.set(checked) }
+                        />
+                    </Form>
+                </div> }
+            } }
+        }
         <div class="corner-buttons">
             <button
                 title="Previous Month"
@@ -520,6 +519,5 @@ pub fn app() -> Html {
                 {"settings"}
             </button>
             </div>
-        </div>
     </>}
 }

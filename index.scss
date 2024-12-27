@@ -82,15 +82,17 @@ table.calendar {
     }
 }
 
-div.corner {
+div.dialog {
+    bottom: 64px;
+    position: absolute;
+    right: 16px;
+}
+
+div.corner-buttons {
     bottom: 16px;
     position: absolute;
     right: 16px;
 
-}
-
-div.corner-buttons {
-    float: right;
     button {
         color: #00000080;
         height: 48px;
@@ -126,7 +128,7 @@ div.dialog {
 }
 
 @media print {
-    div.corner {
+    div:is(.corner-buttons, .dialog) {
         display: none;
     }
 }
