@@ -2,22 +2,6 @@
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-:root {
-    --color-solar-term: green;
-    --color-text: black;
-    --color-theme: red;
-    --color-title: grey;
-    --color-today-text: white;
-    --color-weekend: red;
-    --size-cell-height: 96px;
-    --size-cell-width: 96px;
-    --size-header-height: 96px;
-    --size-text: 24px;
-    --size-text-title: 24px;
-    --size-text-year: 32px;
-    --size-year-padding: 32px;
-}
-
 html {
     height: 100%;
 }
@@ -136,6 +120,10 @@ div.dialog {
 
     td:last-child {
         text-align: right;
+    }
+
+    input {
+        font-family: monospace;
     }
 }
 

@@ -6,6 +6,8 @@ use yew::prelude::*;
 #[derive(Clone, Debug, PartialEq, Properties)]
 pub struct Props {
     pub name: AttrValue,
+    #[prop_or(AttrValue::Static("text"))]
+    pub r#type: AttrValue,
     pub value: AttrValue,
     pub onchange: Callback<String>,
 }
@@ -17,7 +19,7 @@ pub fn StringInput(props: &Props) -> Html {
         <td>{ props.name.deref() }</td>
         <td>
             <input
-                type="text"
+                type={ props.r#type.clone() }
                 value={ props.value.clone() }
                 onchange={ move |event: Event| {
                     if let Some(element) = event

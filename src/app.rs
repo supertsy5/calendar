@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{ops::Deref, rc::Rc};
 
 use chrono::{Datelike, Local, Month, NaiveDate, Weekday};
 use nongli::{
@@ -9,7 +9,7 @@ use nongli::{
 };
 use yew::prelude::*;
 
-use crate::form::{CheckboxInput, Form, IntInput, Select, SelectOption};
+use crate::form::{CheckboxInput, Form, IntInput, Select, SelectOption, StringInput};
 
 const LANGUAGES: [Language; 3] = [
     Language::English,
@@ -136,12 +136,22 @@ pub fn app() -> Html {
     });
     let active_dialog = use_reducer_eq(|| ActiveDialog(None));
 
+    let color_text = use_state_eq(|| Rc::<str>::from("#111111"));
+    let color_theme = use_state_eq(|| Rc::<str>::from("#0000ff"));
+    let color_title = use_state_eq(|| Rc::<str>::from("#808080"));
+    let color_today_text = use_state_eq(|| Rc::<str>::from("#ffffff"));
+    let color_weekend = use_state_eq(|| Rc::<str>::from("#ff0000"));
+    let color_solar_term = use_state_eq(|| Rc::<str>::from("#008000"));
+
     let language_index = use_state_eq(|| 0u32);
     let enable_chinese = use_state_eq(|| false);
     let start_on_monday = use_state_eq(|| false);
     let highlight_today = use_state_eq(|| true);
 
-    let language = LANGUAGES.get(*language_index as usize).copied().unwrap_or(Language::English);
+    let language = LANGUAGES
+        .get(*language_index as usize)
+        .copied()
+        .unwrap_or(Language::English);
     let options = Options {
         language,
         enable_chinese: *enable_chinese,
@@ -173,12 +183,44 @@ pub fn app() -> Html {
     let active_dialog_dispatcher1 = active_dialog.dispatcher();
     let active_dialog_dispatcher2 = active_dialog.dispatcher();
 
+    let color_text_setter = color_text.setter();
+    let color_theme_setter = color_theme.setter();
+    let color_title_setter = color_title.setter();
+    let color_today_text_setter = color_today_text.setter();
+    let color_weekend_setter = color_weekend.setter();
+    let color_solar_term_setter = color_solar_term.setter();
+
     let language_setter = language_index.setter();
     let enable_chinese_setter = enable_chinese.setter();
     let start_on_monday_setter = start_on_monday.setter();
     let highlight_today_setter = highlight_today.setter();
 
     html! { <>
+        <style>{
+            format!("
+            :root {{
+                --color-text: {color_text};
+                --color-theme: {color_theme};
+                --color-title: {color_title};
+                --color-today-text: {color_today_text};
+                --color-weekend: {color_weekend};
+                --color-solar-term: {color_solar_term};
+                --size-cell-height: 96px;
+                --size-cell-width: 96px;
+                --size-header-height: 96px;
+                --size-text: 24px;
+                --size-text-title: 24px;
+                --size-text-year: 32px;
+                --size-year-padding: 32px;
+            }}",
+            color_text = color_text.deref(),
+            color_theme = color_theme.deref(),
+            color_title = color_title.deref(),
+            color_today_text = color_today_text.deref(),
+            color_weekend = color_weekend.deref(),
+            color_solar_term = color_solar_term.deref(),
+        )
+        }</style>
         <main>
             <div class="header">
                 <div class="side left">{ year_month.month.name() }</div>
@@ -273,6 +315,40 @@ pub fn app() -> Html {
                     Dialog::Styles => html! {<div class="dialog">
                         <div class="title">{"Styles"}</div>
                         <Form>
+                            <StringInput
+                                name="Text Color"
+                                value={ color_text.deref().clone() }
+                                onchange={ move |value| color_text_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Theme Color"
+                                value={ color_theme.deref().clone() }
+                                onchange={ move |value| color_theme_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Title Color"
+                                value={ color_title.deref().clone() }
+                                onchange={ move |value| color_title_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Today Text Color"
+                                value={ color_today_text.deref().clone() }
+                                onchange={move |value| {
+                                    color_today_text_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Weekend Color"
+                                value={ color_weekend.deref().clone() }
+                                onchange={ move |value| color_weekend_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Solar Term Color"
+                                value={ color_solar_term.deref().clone() }
+                                onchange={ move |value| {
+                                    color_solar_term_setter.set(Rc::from(value))
+                                } }
+                            />
                         </Form>
                     </div> },
                     Dialog::Settings => html! { <div class="dialog">
