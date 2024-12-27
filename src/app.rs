@@ -141,7 +141,14 @@ pub fn app() -> Html {
     let color_title = use_state_eq(|| Rc::<str>::from("#808080"));
     let color_today_text = use_state_eq(|| Rc::<str>::from("#ffffff"));
     let color_weekend = use_state_eq(|| Rc::<str>::from("#ff0000"));
-    let color_solar_term = use_state_eq(|| Rc::<str>::from("#008000"));
+    let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
+    let size_cell_width = use_state_eq(|| Rc::<str>::from("96px"));
+    let size_cell_height = use_state_eq(|| Rc::<str>::from("96px"));
+    let size_header_height = use_state_eq(|| Rc::<str>::from("96px"));
+    let size_text = use_state_eq(|| Rc::<str>::from("24px"));
+    let size_text_month = use_state_eq(|| Rc::<str>::from("32px"));
+    let size_text_year = use_state_eq(|| Rc::<str>::from("48px"));
+    let size_year_padding = use_state_eq(|| Rc::<str>::from("64px"));
 
     let language_index = use_state_eq(|| 0u32);
     let enable_chinese = use_state_eq(|| false);
@@ -189,6 +196,13 @@ pub fn app() -> Html {
     let color_today_text_setter = color_today_text.setter();
     let color_weekend_setter = color_weekend.setter();
     let color_solar_term_setter = color_solar_term.setter();
+    let size_cell_width_setter = size_cell_width.setter();
+    let size_cell_height_setter = size_cell_height.setter();
+    let size_header_height_setter = size_header_height.setter();
+    let size_text_setter = size_text.setter();
+    let size_text_month_setter = size_text_month.setter();
+    let size_text_year_setter = size_text_year.setter();
+    let size_year_padding_setter = size_year_padding.setter();
 
     let language_setter = language_index.setter();
     let enable_chinese_setter = enable_chinese.setter();
@@ -205,13 +219,13 @@ pub fn app() -> Html {
                 --color-today-text: {color_today_text};
                 --color-weekend: {color_weekend};
                 --color-solar-term: {color_solar_term};
-                --size-cell-height: 96px;
-                --size-cell-width: 96px;
-                --size-header-height: 96px;
-                --size-text: 24px;
-                --size-text-title: 24px;
-                --size-text-year: 32px;
-                --size-year-padding: 32px;
+                --size-cell-width: {size_cell_width};
+                --size-cell-height: {size_cell_height};
+                --size-header-height: {size_header_height};
+                --size-text: {size_text};
+                --size-text-month: {size_text_month};
+                --size-text-year: {size_text_year};
+                --size-year-padding: {size_year_padding};
             }}",
             color_text = color_text.deref(),
             color_theme = color_theme.deref(),
@@ -219,6 +233,13 @@ pub fn app() -> Html {
             color_today_text = color_today_text.deref(),
             color_weekend = color_weekend.deref(),
             color_solar_term = color_solar_term.deref(),
+            size_cell_width = size_cell_width.deref(),
+            size_cell_height = size_cell_height.deref(),
+            size_header_height = size_header_height.deref(),
+            size_text = size_text.deref(),
+            size_text_month = size_text_month.deref(),
+            size_text_year = size_text_year.deref(),
+            size_year_padding = size_year_padding.deref(),
         )
         }</style>
         <main>
@@ -347,6 +368,51 @@ pub fn app() -> Html {
                                 value={ color_solar_term.deref().clone() }
                                 onchange={ move |value| {
                                     color_solar_term_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Cell Width"
+                                value={ size_cell_width.deref().clone() }
+                                onchange={ move |value| {
+                                    size_cell_width_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Cell Height"
+                                value={ size_cell_height.deref().clone() }
+                                onchange={ move |value| {
+                                    size_cell_height_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Header Height"
+                                value={ size_header_height.deref().clone() }
+                                onchange={ {
+                                    move |value| size_header_height_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Text Size"
+                                value={ size_text.deref().clone() }
+                                onchange={ move |value| size_text_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Month Size"
+                                value={ size_text_month.deref().clone() }
+                                onchange={ move |value| {
+                                    size_text_month_setter.set(Rc::from(value))
+                                } }
+                            />
+                            <StringInput
+                                name="Year Size"
+                                value={ size_text_year.deref().clone() }
+                                onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
+                            />
+                            <StringInput
+                                name="Year Padding"
+                                value={ size_year_padding.deref().clone() }
+                                onchange={ move |value| {
+                                    size_year_padding_setter.set(Rc::from(value))
                                 } }
                             />
                         </Form>
