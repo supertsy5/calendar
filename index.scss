@@ -59,13 +59,13 @@ table.calendar {
         text-align: center;
         width: var(--size-cell-width);
 
+        &.weekend {
+            color: var(--color-weekend);
+        }
+
         &.today {
             background-color: var(--color-theme);
             color: var(--color-today-text);
-        }
-
-        &.weekend {
-            color: var(--color-weekend);
         }
 
         div.day {
