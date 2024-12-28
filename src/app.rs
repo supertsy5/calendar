@@ -5,11 +5,14 @@ use nongli::{
     calendar::{Calendar, Options},
     is_weekend,
     iter::{Months, Weekdays},
-    language::{Language, ShortTranslate, Translate},
+    language::{Language, ShortTranslate, StaticTranslate, Translate},
 };
 use yew::prelude::*;
 
-use crate::form::{CheckboxInput, ColorInput, Form, IntInput, Select, SelectOption, StringInput};
+use crate::{
+    form::{CheckboxInput, ColorInput, Form, IntInput, Select, SelectOption, StringInput},
+    translations,
+};
 
 const LANGUAGES: [Language; 3] = [
     Language::English,
@@ -300,10 +303,10 @@ pub fn app() -> Html {
         if let Some(dialog) = active_dialog_value {{
             match dialog {
                 Dialog::Jump => html! { <div class="dialog">
-                    <div class="title">{"Jump"}</div>
+                    <div class="title">{ translations::Jump.static_translate(language) }</div>
                     <Form>
                         <IntInput
-                            name="Year"
+                            name={ translations::Year.static_translate(language) }
                             min={ Some(-262143) }
                             max={ Some(262142) }
                             value={ year_month.year }
@@ -312,7 +315,7 @@ pub fn app() -> Html {
                                     .dispatch(YearMonthAction::SetYear(value));
                         } }/>
                         <Select
-                            name="Month"
+                            name={ translations::Month.static_translate(language) }
                             value={ year_month.month as u32 }
                             onchange={move |value| {
                                 if let Ok(month) = Month::try_from(value as u8 + 1) {
@@ -333,82 +336,82 @@ pub fn app() -> Html {
                     </Form>
                 </div> },
                 Dialog::Styles => html! {<div class="dialog">
-                    <div class="title">{"Styles"}</div>
+                    <div class="title">{ translations::Styles.static_translate(language) }</div>
                     <Form>
                         <ColorInput
-                            name="Text Color"
+                            name={ translations::TextColor.static_translate(language) }
                             value={ color_text.deref().clone() }
                             onchange={ move |value| color_text_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
-                            name="Theme Color"
+                            name={ translations::ThemeColor.static_translate(language) }
                             value={ color_theme.deref().clone() }
                             onchange={ move |value| color_theme_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
-                            name="Title Color"
+                            name={ translations::TitleColor.static_translate(language) }
                             value={ color_title.deref().clone() }
                             onchange={ move |value| color_title_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
-                            name="Today Text Color"
+                            name={ translations::TodayTextColor.static_translate(language) }
                             value={ color_today_text.deref().clone() }
                             onchange={move |value| {
                                 color_today_text_setter.set(Rc::from(value))
                             } }
                         />
                         <ColorInput
-                            name="Weekend Color"
+                            name={ translations::WeekendColor.static_translate(language) }
                             value={ color_weekend.deref().clone() }
                             onchange={ move |value| color_weekend_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
-                            name="Solar Term Color"
+                            name={ translations::SolarTermColor.static_translate(language) }
                             value={ color_solar_term.deref().clone() }
                             onchange={ move |value| {
                                 color_solar_term_setter.set(Rc::from(value))
                             } }
                         />
                         <StringInput
-                            name="Cell Width"
+                            name={ translations::CellWidth.static_translate(language) }
                             value={ size_cell_width.deref().clone() }
                             onchange={ move |value| {
                                 size_cell_width_setter.set(Rc::from(value))
                             } }
                         />
                         <StringInput
-                            name="Cell Height"
+                            name={ translations::CellHeight.static_translate(language) }
                             value={ size_cell_height.deref().clone() }
                             onchange={ move |value| {
                                 size_cell_height_setter.set(Rc::from(value))
                             } }
                         />
                         <StringInput
-                            name="Header Height"
+                            name={ translations::HeaderHeight.static_translate(language) }
                             value={ size_header_height.deref().clone() }
                             onchange={ {
                                 move |value| size_header_height_setter.set(Rc::from(value))
                             } }
                         />
                         <StringInput
-                            name="Text Size"
+                            name={ translations::TextSize.static_translate(language) }
                             value={ size_text.deref().clone() }
                             onchange={ move |value| size_text_setter.set(Rc::from(value)) }
                         />
                         <StringInput
-                            name="Month Size"
+                            name={ translations::MonthSize.static_translate(language) }
                             value={ size_text_month.deref().clone() }
                             onchange={ move |value| {
                                 size_text_month_setter.set(Rc::from(value))
                             } }
                         />
                         <StringInput
-                            name="Year Size"
+                            name={ translations::YearSize.static_translate(language) }
                             value={ size_text_year.deref().clone() }
                             onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
                         />
                         <StringInput
-                            name="Year Padding"
+                            name={ translations::YearPadding.static_translate(language) }
                             value={ size_year_padding.deref().clone() }
                             onchange={ move |value| {
                                 size_year_padding_setter.set(Rc::from(value))
@@ -417,10 +420,10 @@ pub fn app() -> Html {
                     </Form>
                 </div> },
                 Dialog::Settings => html! { <div class="dialog">
-                    <div class="title">{"Settings"}</div>
+                    <div class="title">{ translations::Language.static_translate(language) }</div>
                     <Form>
                         <Select
-                            name="Language"
+                            name={ translations::Language.static_translate(language) }
                             value={ *language_index }
                             onchange={ move |value| language_setter.set(value) }
                         >
@@ -429,17 +432,17 @@ pub fn app() -> Html {
                             <SelectOption>{"繁體中文"}</SelectOption>
                         </Select>
                         <CheckboxInput
-                            name="Enable Chinese"
+                            name={ translations::EnableChineseCalendar.static_translate(language) }
                             checked={ *enable_chinese }
                             onchange={ move |checked| enable_chinese_setter.set(checked) }
                         />
                         <CheckboxInput
-                            name="Start on Monday"
+                            name={ translations::StartOnMonday.static_translate(language) }
                             checked={ *start_on_monday }
                             onchange={ move |checked| start_on_monday_setter.set(checked) }
                         />
                         <CheckboxInput
-                            name="Highlight Today"
+                            name={ translations::HighlightToday.static_translate(language) }
                             checked={ *highlight_today }
                             onchange={ move |checked| highlight_today_setter.set(checked) }
                         />
@@ -449,7 +452,7 @@ pub fn app() -> Html {
         }
         <div class="corner-buttons">
             <button
-                title="Previous Month"
+                title={ translations::PrevMonth.static_translate(language) }
                 class="material-symbols-outlined"
                 disabled={
                     year_month.month == Month::January
@@ -460,7 +463,7 @@ pub fn app() -> Html {
                 {"arrow_back"}
             </button>
             <button
-                title="Next Month"
+                title={ translations::NextMonth.static_translate(language) }
                 class="material-symbols-outlined"
                 disabled={
                     year_month.month == Month::December
@@ -471,14 +474,14 @@ pub fn app() -> Html {
                 {"arrow_forward"}
             </button>
             <button
-                title="Today"
+                title={ translations::Today.static_translate(language) }
                 class="material-symbols-outlined"
                 onclick={ move |_| year_month_dispatcher2.dispatch(YearMonthAction::Today) }
             >
                 {"today"}
             </button>
             <button
-                title="Jump"
+                title={ translations::Jump.static_translate(language) }
                 class={ classes!(
                     "material-symbols-outlined",
                     (active_dialog_value == Some(Dialog::Jump)).then_some("active"),
@@ -488,7 +491,7 @@ pub fn app() -> Html {
                 {"calendar_month"}
             </button>
             <button
-                title="Print"
+                title={ translations::Print.static_translate(language) }
                 class="material-symbols-outlined"
                 onclick={ |_| {
                     if let Some(window) = web_sys::window() {
@@ -499,7 +502,7 @@ pub fn app() -> Html {
                 {"print"}
             </button>
             <button
-                title="Styles"
+                title={ translations::Styles.static_translate(language) }
                 class={ classes!(
                     "material-symbols-outlined",
                     (active_dialog_value == Some(Dialog::Styles)).then_some("active"),
@@ -509,7 +512,7 @@ pub fn app() -> Html {
                 {"style"}
             </button>
             <button
-                title="Settings"
+                title={ translations::Settings.static_translate(language) }
                 class={ classes!(
                     "material-symbols-outlined",
                     (active_dialog_value == Some(Dialog::Settings)).then_some("active"),

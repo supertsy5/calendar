@@ -1,5 +1,6 @@
 mod app;
 mod form;
+mod translations;
 
 use app::App;
 
