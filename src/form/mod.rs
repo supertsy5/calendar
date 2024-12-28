@@ -16,7 +16,7 @@ pub mod select;
 
 #[function_component]
 pub fn Form(props: &ChildrenProps) -> Html {
-    html! {
-        <table class="form">{ props.children.clone() }</table>
-    }
+    html! { <div class="form">
+        <table>{ props.children.clone() }</table>
+    </div> }
 }

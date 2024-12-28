@@ -7,7 +7,6 @@ body {
     display: flex;
     color: var(--color-text);
     flex-direction: column;
-    font-family: "Noto Sans SC", "sans-serif";
     margin: 0px;
 }
 
@@ -23,19 +22,20 @@ button {
 
 div.header {
     align-items: center;
-    color: var(--color-title);
     display: flex;
-    font-size: var(--size-text-month);
     height: var(--size-header-height);
     justify-content: center;
 
     div.year {
+        color: var(--color-year);
         font-size: var(--size-text-year);
         margin: 0px var(--size-year-margin);
     }
 
     div.side {
+        color: var(--color-month);
         flex: 1 0 0;
+        font-size: var(--size-text-month);
 
         &.left {
             text-align: right;
@@ -65,6 +65,7 @@ table.calendar {
 
         &.today {
             background-color: var(--color-theme);
+            border-radius: var(--size-today-border-radius);
             color: var(--color-today-text);
         }
 
@@ -82,15 +83,9 @@ table.calendar {
     }
 }
 
-div.dialog {
-    bottom: 64px;
-    position: absolute;
-    right: 16px;
-}
-
 div.corner-buttons {
     bottom: 16px;
-    position: absolute;
+    position: fixed;
     right: 16px;
 
     button {
@@ -106,24 +101,31 @@ div.corner-buttons {
 
 div.dialog {
     background-color: white;
-    border-radius: 4px;
-    box-shadow: 0px 1px 3px #00000080;
+    bottom: 64px;
+    border: 1px solid gray;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
     padding: 8px;
+    position: fixed;
+    right: 16px;
+
+    input {
+        font-family: monospace;
+    }
 
     div.title {
+        font-weight: bold;
         text-align: center;
     }
 
-    table {
-        width: 100%;
+    div.form {
+        overflow: auto;
     }
 
     td:last-child {
         text-align: right;
-    }
-
-    input {
-        font-family: monospace;
     }
 }
 

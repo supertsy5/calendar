@@ -14,10 +14,28 @@ use crate::{
     translations,
 };
 
-const LANGUAGES: [Language; 3] = [
+const LANGUAGES: &[Language] = &[
     Language::English,
     Language::ChineseSimplified,
     Language::ChineseTraditional,
+];
+
+const GENERIC_FONTS: &[&str] = &[
+    "cursive",
+    "emoji",
+    "fangsong",
+    "fantasy",
+    "kai",
+    "math",
+    "monospace",
+    "nastaliq",
+    "sans-serif",
+    "serif",
+    "system-ui",
+    "ui-monospace",
+    "ui-rounded",
+    "ui-sans-serif",
+    "ui-serif",
 ];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -141,18 +159,20 @@ pub fn app() -> Html {
 
     let color_text = use_state_eq(|| Rc::<str>::from("#111111"));
     let color_theme = use_state_eq(|| Rc::<str>::from("#0000ff"));
-    let color_title = use_state_eq(|| Rc::<str>::from("#808080"));
+    let color_year = use_state_eq(|| Rc::<str>::from("#808080"));
+    let color_month = use_state_eq(|| Rc::<str>::from("#808080"));
     let color_today_text = use_state_eq(|| Rc::<str>::from("#ffffff"));
     let color_weekend = use_state_eq(|| Rc::<str>::from("#ff0000"));
     let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
+    let font = use_state_eq(|| Rc::<str>::from("sans-serif"));
     let size_cell_width = use_state_eq(|| Rc::<str>::from("96px"));
     let size_cell_height = use_state_eq(|| Rc::<str>::from("96px"));
     let size_header_height = use_state_eq(|| Rc::<str>::from("96px"));
     let size_text = use_state_eq(|| Rc::<str>::from("24px"));
+    let size_text_year = use_state_eq(|| Rc::<str>::from("48px"));
+    let size_text_month = use_state_eq(|| Rc::<str>::from("32px"));
     let size_text_weekday = use_state_eq(|| Rc::<str>::from("inherit"));
     let size_text_chinese = use_state_eq(|| Rc::<str>::from("inherit"));
-    let size_text_month = use_state_eq(|| Rc::<str>::from("32px"));
-    let size_text_year = use_state_eq(|| Rc::<str>::from("48px"));
     let size_year_margin = use_state_eq(|| Rc::<str>::from("64px"));
 
     let language_index = use_state_eq(|| 0u32);
@@ -197,18 +217,20 @@ pub fn app() -> Html {
 
     let color_text_setter = color_text.setter();
     let color_theme_setter = color_theme.setter();
-    let color_title_setter = color_title.setter();
+    let color_year_setter = color_year.setter();
+    let color_month_setter = color_month.setter();
     let color_today_text_setter = color_today_text.setter();
     let color_weekend_setter = color_weekend.setter();
     let color_solar_term_setter = color_solar_term.setter();
+    let font_setter = font.setter();
     let size_cell_width_setter = size_cell_width.setter();
     let size_cell_height_setter = size_cell_height.setter();
     let size_header_height_setter = size_header_height.setter();
     let size_text_setter = size_text.setter();
     let size_text_weekday_setter = size_text_weekday.setter();
     let size_text_chinese_setter = size_text_chinese.setter();
-    let size_text_month_setter = size_text_month.setter();
     let size_text_year_setter = size_text_year.setter();
+    let size_text_month_setter = size_text_month.setter();
     let size_year_margin_setter = size_year_margin.setter();
 
     let language_setter = language_index.setter();
@@ -216,13 +238,32 @@ pub fn app() -> Html {
     let start_on_monday_setter = start_on_monday.setter();
     let highlight_today_setter = highlight_today.setter();
 
+    let fonts_to_download = font
+        .split(',')
+        .map(|s| s.trim().trim_matches('"'))
+        .filter(|s| !GENERIC_FONTS.contains(&s))
+        .collect::<Vec<_>>();
+
     html! { <>
+        if !fonts_to_download.is_empty() {
+            <style>{
+                format!(
+                    "@import url(\"https://fonts.googleapis.com/css2?{}display=swap\");",
+                    fonts_to_download
+                        .into_iter()
+                        .map(|s| format!("family={s}&"))
+                        .collect::<String>(),
+                )
+
+            }</style>
+        }
         <style>{
             format!("
             :root {{
                 --color-text: {color_text};
                 --color-theme: {color_theme};
-                --color-title: {color_title};
+                --color-year: {color_year};
+                --color-month: {color_month};
                 --color-today-text: {color_today_text};
                 --color-weekend: {color_weekend};
                 --color-solar-term: {color_solar_term};
@@ -235,13 +276,20 @@ pub fn app() -> Html {
                 --size-text-month: {size_text_month};
                 --size-text-year: {size_text_year};
                 --size-year-margin: {size_year_margin};
-            }}",
+            }}
+            
+            body {{
+                font-family: {font};
+            }}
+            ",
             color_text = color_text.deref(),
             color_theme = color_theme.deref(),
-            color_title = color_title.deref(),
+            color_year = color_year.deref(),
+            color_month = color_month.deref(),
             color_today_text = color_today_text.deref(),
             color_weekend = color_weekend.deref(),
             color_solar_term = color_solar_term.deref(),
+            font = font.deref(),
             size_cell_width = size_cell_width.deref(),
             size_cell_height = size_cell_height.deref(),
             size_header_height = size_header_height.deref(),
@@ -357,9 +405,14 @@ pub fn app() -> Html {
                             onchange={ move |value| color_theme_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
-                            name={ translations::TitleColor.static_translate(language) }
-                            value={ color_title.deref().clone() }
-                            onchange={ move |value| color_title_setter.set(Rc::from(value)) }
+                            name={ translations::YearColor.static_translate(language) }
+                            value={ color_year.deref().clone() }
+                            onchange={ move |value| color_year_setter.set(Rc::from(value)) }
+                        />
+                        <ColorInput
+                            name={ translations::MonthColor.static_translate(language) }
+                            value={ color_month.deref().clone() }
+                            onchange={ move |value| color_month_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
                             name={ translations::TodayTextColor.static_translate(language) }
@@ -379,6 +432,11 @@ pub fn app() -> Html {
                             onchange={ move |value| {
                                 color_solar_term_setter.set(Rc::from(value))
                             } }
+                        />
+                        <StringInput
+                            name={ translations::Font.static_translate(language) }
+                            value={ font.deref().clone() }
+                            onchange={ move |value| font_setter.set(Rc::from(value)) }
                         />
                         <StringInput
                             name={ translations::CellWidth.static_translate(language) }
@@ -402,43 +460,43 @@ pub fn app() -> Html {
                             } }
                         />
                         <StringInput
-                            name={ translations::TextSize.static_translate(language) }
-                            value={ size_text.deref().clone() }
-                            onchange={ move |value| size_text_setter.set(Rc::from(value)) }
-                        />
-                        <StringInput
-                            name={ translations::WeekdaySize.static_translate(language) }
-                            value={ size_text_weekday.deref().clone() }
-                            onchange={ move |value| size_text_weekday_setter.set(Rc::from(value)) }
-                        />
-                        <StringInput
-                            name={ translations::ChineseSize.static_translate(language) }
-                            value={ size_text.deref().clone() }
-                            onchange={ move |value| size_text_chinese_setter.set(Rc::from(value)) }
-                        />
-                        <StringInput
-                            name={ translations::MonthSize.static_translate(language) }
-                            value={ size_text_month.deref().clone() }
-                            onchange={ move |value| {
-                                size_text_month_setter.set(Rc::from(value))
-                            } }
-                        />
-                        <StringInput
-                            name={ translations::YearSize.static_translate(language) }
-                            value={ size_text_year.deref().clone() }
-                            onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
-                        />
-                        <StringInput
                             name={ translations::YearMargin.static_translate(language) }
                             value={ size_year_margin.deref().clone() }
                             onchange={ move |value| {
                                 size_year_margin_setter.set(Rc::from(value))
                             } }
                         />
+                        <StringInput
+                            name={ translations::TextSize.static_translate(language) }
+                            value={ size_text.deref().clone() }
+                            onchange={ move |value| size_text_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name={ translations::WeekdayTextSize.static_translate(language) }
+                            value={ size_text_weekday.deref().clone() }
+                            onchange={ move |value| size_text_weekday_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name={ translations::ChineseTextSize.static_translate(language) }
+                            value={ size_text_chinese.deref().clone() }
+                            onchange={ move |value| size_text_chinese_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name={ translations::YearTextSize.static_translate(language) }
+                            value={ size_text_year.deref().clone() }
+                            onchange={ move |value| size_text_year_setter.set(Rc::from(value)) }
+                        />
+                        <StringInput
+                            name={ translations::MonthTextSize.static_translate(language) }
+                            value={ size_text_month.deref().clone() }
+                            onchange={ move |value| {
+                                size_text_month_setter.set(Rc::from(value))
+                            } }
+                        />
                     </Form>
                 </div> },
                 Dialog::Settings => html! { <div class="dialog">
-                    <div class="title">{ translations::Language.static_translate(language) }</div>
+                    <div class="title">{ translations::Settings.static_translate(language) }</div>
                     <Form>
                         <Select
                             name={ translations::Language.static_translate(language) }
