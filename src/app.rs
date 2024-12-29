@@ -25,10 +25,14 @@ const GENERIC_FONTS: &[&str] = &[
     "emoji",
     "fangsong",
     "fantasy",
+    "inherit",
+    "initial",
     "kai",
     "math",
     "monospace",
     "nastaliq",
+    "revert",
+    "revert-layer",
     "sans-serif",
     "serif",
     "system-ui",
@@ -36,6 +40,7 @@ const GENERIC_FONTS: &[&str] = &[
     "ui-rounded",
     "ui-sans-serif",
     "ui-serif",
+    "unset",
 ];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
