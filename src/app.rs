@@ -163,6 +163,7 @@ pub fn app() -> Html {
     let color_month = use_state_eq(|| Rc::<str>::from("#808080"));
     let color_today_text = use_state_eq(|| Rc::<str>::from("#ffffff"));
     let color_weekend = use_state_eq(|| Rc::<str>::from("#ff0000"));
+    let color_week_number = use_state(|| Rc::<str>::from("#808080"));
     let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
     let font = use_state_eq(|| Rc::<str>::from("sans-serif"));
     let size_cell_width = use_state_eq(|| Rc::<str>::from("96px"));
@@ -172,13 +173,16 @@ pub fn app() -> Html {
     let size_text_year = use_state_eq(|| Rc::<str>::from("48px"));
     let size_text_month = use_state_eq(|| Rc::<str>::from("32px"));
     let size_text_weekday = use_state_eq(|| Rc::<str>::from("inherit"));
+    let size_text_week_number = use_state_eq(|| Rc::<str>::from("inherit"));
     let size_text_chinese = use_state_eq(|| Rc::<str>::from("inherit"));
     let size_year_margin = use_state_eq(|| Rc::<str>::from("64px"));
 
     let language_index = use_state_eq(|| 0u32);
     let enable_chinese = use_state_eq(|| false);
     let start_on_monday = use_state_eq(|| false);
+    let show_week_numbers = use_state_eq(|| false);
     let highlight_today = use_state_eq(|| true);
+
 
     let language = LANGUAGES
         .get(*language_index as usize)
@@ -188,9 +192,9 @@ pub fn app() -> Html {
         language,
         enable_chinese: *enable_chinese,
         start_on_monday: *start_on_monday,
+        week_number: *show_week_numbers,
         color: false,
     };
-
     let calendar = use_memo(
         (today, *year_month, options, *highlight_today),
         |(today, year_month, options, highlight_today)| {
@@ -203,6 +207,12 @@ pub fn app() -> Html {
             .unwrap()
         },
     );
+    let fonts_to_download = use_memo(font.deref().clone(), |font| {
+        font.split(',')
+            .map(|s| s.trim().trim_matches('"'))
+            .filter_map(|s| (!GENERIC_FONTS.contains(&s)).then(|| s.to_owned()))
+            .collect::<Vec<_>>()
+    });
 
     let active_dialog_value = active_dialog.0;
 
@@ -221,28 +231,25 @@ pub fn app() -> Html {
     let color_month_setter = color_month.setter();
     let color_today_text_setter = color_today_text.setter();
     let color_weekend_setter = color_weekend.setter();
+    let color_week_number_setter = color_week_number.setter();
     let color_solar_term_setter = color_solar_term.setter();
     let font_setter = font.setter();
     let size_cell_width_setter = size_cell_width.setter();
     let size_cell_height_setter = size_cell_height.setter();
     let size_header_height_setter = size_header_height.setter();
     let size_text_setter = size_text.setter();
-    let size_text_weekday_setter = size_text_weekday.setter();
-    let size_text_chinese_setter = size_text_chinese.setter();
     let size_text_year_setter = size_text_year.setter();
     let size_text_month_setter = size_text_month.setter();
+    let size_text_weekday_setter = size_text_weekday.setter();
+    let size_text_week_number_setter = size_text_week_number.setter();
+    let size_text_chinese_setter = size_text_chinese.setter();
     let size_year_margin_setter = size_year_margin.setter();
 
     let language_setter = language_index.setter();
     let enable_chinese_setter = enable_chinese.setter();
     let start_on_monday_setter = start_on_monday.setter();
+    let show_week_numbers_setter = show_week_numbers.setter();
     let highlight_today_setter = highlight_today.setter();
-
-    let fonts_to_download = font
-        .split(',')
-        .map(|s| s.trim().trim_matches('"'))
-        .filter(|s| !GENERIC_FONTS.contains(&s))
-        .collect::<Vec<_>>();
 
     html! { <>
         if !fonts_to_download.is_empty() {
@@ -250,7 +257,7 @@ pub fn app() -> Html {
                 format!(
                     "@import url(\"https://fonts.googleapis.com/css2?{}display=swap\");",
                     fonts_to_download
-                        .into_iter()
+                        .iter()
                         .map(|s| format!("family={s}&"))
                         .collect::<String>(),
                 )
@@ -266,12 +273,14 @@ pub fn app() -> Html {
                 --color-month: {color_month};
                 --color-today-text: {color_today_text};
                 --color-weekend: {color_weekend};
+                --color-week-number: {color_week_number};
                 --color-solar-term: {color_solar_term};
                 --size-cell-width: {size_cell_width};
                 --size-cell-height: {size_cell_height};
                 --size-header-height: {size_header_height};
                 --size-text: {size_text};
                 --size-text-weekday: {size_text_weekday};
+                --size-text-week-number: {size_text_week_number};
                 --size-text-chinese: {size_text_chinese};
                 --size-text-month: {size_text_month};
                 --size-text-year: {size_text_year};
@@ -288,6 +297,7 @@ pub fn app() -> Html {
             color_month = color_month.deref(),
             color_today_text = color_today_text.deref(),
             color_weekend = color_weekend.deref(),
+            color_week_number = color_week_number.deref(),
             color_solar_term = color_solar_term.deref(),
             font = font.deref(),
             size_cell_width = size_cell_width.deref(),
@@ -295,6 +305,7 @@ pub fn app() -> Html {
             size_header_height = size_header_height.deref(),
             size_text = size_text.deref(),
             size_text_weekday = size_text_weekday.deref(),
+            size_text_week_number = size_text_week_number.deref(),
             size_text_chinese = size_text_chinese.deref(),
             size_text_month = size_text_month.deref(),
             size_text_year = size_text_year.deref(),
@@ -313,18 +324,27 @@ pub fn app() -> Html {
             </div>
             <div class="body">
                 <table class="calendar">
-                    <tr>{
-                        for Weekdays(if *start_on_monday { Weekday::Mon } else { Weekday::Sun })
-                            .take(7)
-                            .map(|weekday| html! {
-                                <th class={classes!(is_weekend(weekday).then_some("weekend"))}>
-                                    { weekday.short().translate_to_string(language) }
-                                </th>
-                            })
-                    }</tr>
+                    <tr>
+                        if *show_week_numbers { <th></th> }
+                        {
+                            for Weekdays(if *start_on_monday { Weekday::Mon } else { Weekday::Sun })
+                                .take(7)
+                                .map(|weekday| html! {
+                                    <th class={classes!(
+                                        "weekday",
+                                        is_weekend(weekday).then_some("weekend"),
+                                    )}>
+                                        { weekday.short().translate_to_string(language) }
+                                    </th>
+                                })
+                        }
+                    </tr>
                     {
-                        for calendar.iter().map(|row| html! {
+                        for calendar.iter().map(|(week_number, row)| html! {
                             <tr>
+                                if *show_week_numbers {
+                                    <th class="week-number">{ week_number }</th>
+                                }
                                 {
                                     for row.map(|cell| html! {
                                         if let Some(cell) = cell {
@@ -427,6 +447,13 @@ pub fn app() -> Html {
                             onchange={ move |value| color_weekend_setter.set(Rc::from(value)) }
                         />
                         <ColorInput
+                            name={ translations::WeekNumberColor.static_translate(language) }
+                            value={ color_week_number.deref().clone() }
+                            onchange={ move |value| {
+                                color_week_number_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <ColorInput
                             name={ translations::SolarTermColor.static_translate(language) }
                             value={ color_solar_term.deref().clone() }
                             onchange={ move |value| {
@@ -477,6 +504,13 @@ pub fn app() -> Html {
                             onchange={ move |value| size_text_weekday_setter.set(Rc::from(value)) }
                         />
                         <StringInput
+                            name={ translations::WeekNumberTextSize.static_translate(language) }
+                            value={ size_text_week_number.deref().clone() }
+                            onchange={ move |value| {
+                                size_text_week_number_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <StringInput
                             name={ translations::ChineseTextSize.static_translate(language) }
                             value={ size_text_chinese.deref().clone() }
                             onchange={ move |value| size_text_chinese_setter.set(Rc::from(value)) }
@@ -516,6 +550,11 @@ pub fn app() -> Html {
                             name={ translations::StartOnMonday.static_translate(language) }
                             checked={ *start_on_monday }
                             onchange={ move |checked| start_on_monday_setter.set(checked) }
+                        />
+                        <CheckboxInput
+                            name={ translations::ShowWeekNumbers.static_translate(language) }
+                            checked={ *show_week_numbers }
+                            onchange={ move |checked| show_week_numbers_setter.set(checked) }
                         />
                         <CheckboxInput
                             name={ translations::HighlightToday.static_translate(language) }

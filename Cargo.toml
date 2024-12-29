@@ -12,6 +12,6 @@ categories = ["gui", "wasm", "web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 chrono = "^0.4.39"
-nongli = { version = "^0.4.0", path = "../nongli" }
+nongli = { version = "^0.4.0-20241229", path = "../nongli" }
 web-sys = { version = "^0.3.76", features = ["HtmlSelectElement"] }
 yew = { version = "^0.21", features = ["csr"] }

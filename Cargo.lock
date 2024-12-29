@@ -717,7 +717,7 @@ dependencies = [
 
 [[package]]
 name = "nongli"
-version = "0.4.0"
+version = "0.4.0-20241229"
 dependencies = [
  "chrono",
  "serde",

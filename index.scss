@@ -49,8 +49,17 @@ table.calendar {
     th {
         font-weight: normal;
 
-        &.weekend {
-            color: var(--color-weekend);
+        &.week-number {
+            font-size: var(--size-text-week-number);
+            color: var(--color-week-number);
+        }
+
+        &.weekday {
+            font-size: var(--size-text-weekday);
+
+            &.weekend {
+                color: var(--color-weekend);
+            }
         }
     }
 
@@ -96,7 +105,7 @@ div.corner-buttons {
         &.active {
             color: var(--color-theme);
         }
-}
+    }
 }
 
 div.dialog {
