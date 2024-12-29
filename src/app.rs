@@ -188,7 +188,6 @@ pub fn app() -> Html {
     let show_week_numbers = use_state_eq(|| false);
     let highlight_today = use_state_eq(|| true);
 
-
     let language = LANGUAGES
         .get(*language_index as usize)
         .copied()
@@ -215,7 +214,9 @@ pub fn app() -> Html {
     let fonts_to_download = use_memo(font.deref().clone(), |font| {
         font.split(',')
             .map(|s| s.trim().trim_matches('"'))
-            .filter_map(|s| (!GENERIC_FONTS.contains(&s)).then(|| s.to_owned()))
+            .filter_map(|s| {
+                (!GENERIC_FONTS.contains(&s.to_lowercase().as_str())).then(|| s.to_owned())
+            })
             .collect::<Vec<_>>()
     });
 
