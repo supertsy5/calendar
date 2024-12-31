@@ -169,6 +169,7 @@ pub fn app() -> Html {
     let color_today_text = use_state_eq(|| Rc::<str>::from("#ffffff"));
     let color_weekend = use_state_eq(|| Rc::<str>::from("#ff0000"));
     let color_week_number = use_state(|| Rc::<str>::from("#808080"));
+    let color_festival = use_state(|| Rc::<str>::from("inherit"));
     let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
     let font = use_state_eq(|| Rc::<str>::from("sans-serif"));
     let size_cell_width = use_state_eq(|| Rc::<str>::from("96px"));
@@ -238,6 +239,7 @@ pub fn app() -> Html {
     let color_today_text_setter = color_today_text.setter();
     let color_weekend_setter = color_weekend.setter();
     let color_week_number_setter = color_week_number.setter();
+    let color_festival_setter = color_festival.setter();
     let color_solar_term_setter = color_solar_term.setter();
     let font_setter = font.setter();
     let size_cell_width_setter = size_cell_width.setter();
@@ -280,6 +282,7 @@ pub fn app() -> Html {
                 --color-today-text: {color_today_text};
                 --color-weekend: {color_weekend};
                 --color-week-number: {color_week_number};
+                --color-festival: {color_festival};
                 --color-solar-term: {color_solar_term};
                 --size-cell-width: {size_cell_width};
                 --size-cell-height: {size_cell_height};
@@ -304,6 +307,7 @@ pub fn app() -> Html {
             color_today_text = color_today_text.deref(),
             color_weekend = color_weekend.deref(),
             color_week_number = color_week_number.deref(),
+            color_festival = color_festival.deref(),
             color_solar_term = color_solar_term.deref(),
             font = font.deref(),
             size_cell_width = size_cell_width.deref(),
@@ -359,9 +363,13 @@ pub fn app() -> Html {
                                                 cell.weekend.then_some("weekend"),
                                             ) }>
                                                 <div class="day">{ cell.date.day() }</div>
-                                                if let Some(solar_term) = cell.solar_term {
+                                                if let Some(festival) = cell.festival {
+                                                    <div class="chinese festival">{
+                                                        festival.static_translate(language)
+                                                    }</div>
+                                                } else if let Some(solar_term) = cell.solar_term {
                                                     <div class="chinese solar-term">{
-                                                        solar_term.translate_to_string(language)
+                                                        solar_term.static_translate(language)
                                                     }</div>
                                                 } else if let Some(chinese) = cell.chinese_date {
                                                     <div class="chinese">{
@@ -457,6 +465,13 @@ pub fn app() -> Html {
                             value={ color_week_number.deref().clone() }
                             onchange={ move |value| {
                                 color_week_number_setter.set(Rc::from(value))
+                            } }
+                        />
+                        <ColorInput
+                            name={ translations::FestivalColor.static_translate(language) }
+                            value={ color_festival.deref().clone() }
+                            onchange={ move |value| {
+                                color_festival_setter.set(Rc::from(value))
                             } }
                         />
                         <ColorInput

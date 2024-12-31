@@ -80,10 +80,15 @@ table.calendar {
 
         div.day {
             font-size: var(--size-text);
+            vertical-align: bottom;
         }
 
         div.chinese {
             font-size: var(--size-text-chinese);
+
+            &.festival {
+                color: var(--color-festival);
+            }
 
             &.solar-term {
                 color: var(--color-solar-term);
