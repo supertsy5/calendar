@@ -87,6 +87,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "325918d6fe32f23b19878fe4b34794ae41fc19ddbe53b10571a4874d44ffd39b"
 
 [[package]]
+name = "calendar"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "nongli",
+ "web-sys",
+ "yew",
+]
+
+[[package]]
 name = "cc"
 version = "1.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -717,7 +727,7 @@ dependencies = [
 
 [[package]]
 name = "nongli"
-version = "0.4.0-20241231.1"
+version = "0.4.0"
 dependencies = [
  "chrono",
 ]
@@ -1091,16 +1101,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e672c95779cf947c5311f83787af4fa8fffd12fb27e4993211a84bdfd9610f9c"
 dependencies = [
  "once_cell",
-]
-
-[[package]]
-name = "trunk-template"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "nongli",
- "web-sys",
- "yew",
 ]
 
 [[package]]
