@@ -53,6 +53,7 @@ enum YearMonthAction {
     NextMonth,
     PrevMonth,
     Today,
+    #[allow(dead_code)]
     Set(i32, Month),
     SetYear(i32),
     SetMonth(Month),
