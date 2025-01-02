@@ -213,13 +213,22 @@ pub fn app() -> Html {
             .unwrap()
         },
     );
-    let fonts_to_download = use_memo(font.deref().clone(), |font| {
-        font.split(',')
+    let css_import = use_memo(font.deref().clone(), |font| {
+        let fonts = font
+            .split(',')
             .map(|s| s.trim().trim_matches('"'))
-            .filter_map(|s| {
-                (!GENERIC_FONTS.contains(&s.to_lowercase().as_str())).then(|| s.to_owned())
+            .filter(|s| !GENERIC_FONTS.contains(&s.to_lowercase().as_str()))
+            .flat_map(|s| {
+                "&family="
+                    .chars()
+                    .chain(s.chars().map(|ch| if ch == ' ' { '+' } else { ch }))
             })
-            .collect::<Vec<_>>()
+            .collect::<String>();
+        if fonts.is_empty() {
+            String::new()
+        } else {
+            format!("@import url(\"https://fonts.googleapis.com/css2?display=swap{fonts}\");")
+        }
     });
 
     let active_dialog_value = active_dialog.0;
@@ -261,17 +270,8 @@ pub fn app() -> Html {
     let highlight_today_setter = highlight_today.setter();
 
     html! { <>
-        if !fonts_to_download.is_empty() {
-            <style>{
-                format!(
-                    "@import url(\"https://fonts.googleapis.com/css2?{}display=swap\");",
-                    fonts_to_download
-                        .iter()
-                        .map(|s| format!("family={s}&"))
-                        .collect::<String>(),
-                )
-
-            }</style>
+        if !css_import.is_empty() {
+            <style>{ css_import }</style>
         }
         <style>{
             format!("
