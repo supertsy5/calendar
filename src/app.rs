@@ -658,6 +658,9 @@ pub fn app() -> Html {
             >
                 {"settings"}
             </button>
-            </div>
+            <a href="https://github.com/supertsy5/calendar">
+                <button title="GitHub" class="material-symbols-outlined">{"code"}</button>
+            </a>
+        </div>
     </>}
 }
