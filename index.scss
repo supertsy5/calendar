@@ -7,6 +7,7 @@ body {
     display: flex;
     color: var(--color-text);
     flex-direction: column;
+    font-family: var(--font-family);
     margin: 0px;
 }
 
@@ -121,10 +122,12 @@ div.dialog {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 80px);
+    max-height: calc(100svh - 80px);
+    max-width: calc(100svw - 80px);
     padding: 8px;
     position: fixed;
     right: 16px;
+    z-index: 256;
 
     input {
         font-family: monospace;
@@ -138,6 +141,10 @@ div.dialog {
     div.form {
         overflow: auto;
     }
+    
+    td:first-child {
+        max-width: max-content;
+    }
 
     td:last-child {
         text-align: right;
@@ -147,5 +154,41 @@ div.dialog {
 @media print {
     div:is(.corner-buttons, .dialog) {
         display: none;
+    }
+}
+
+@media (min-width: 416px) {
+    button.button-more {
+        display: none;
+    }
+
+    div.more {
+        display: inline-block;
+    }
+}
+
+@media (max-width: 415px) {
+    div.dialog {
+        right: 64px;
+    }
+
+    div.more {
+        bottom: 48px;
+        position: absolute;
+        right: 0px;
+        width: 48px;
+
+        &:not(.visible) {
+            display: none;
+        }
+
+        button::before {
+            content: attr(title);
+            font-size: initial;
+            font-family: var(--font-family);
+            padding: 4px;
+            position: absolute;
+            right: 48px;
+        }
     }
 }

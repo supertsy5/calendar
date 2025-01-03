@@ -56,6 +56,7 @@ translate!(
     (PrevMonth, "Previous Month", "上一月"),
     (NextMonth, "Next Month", "下一月"),
     (Today, "Today", "今日"),
+    (More, "More", "更多"),
     (Year, "Year", "年"),
     (Month, "Month", "月"),
     (HighlightToday, "Highlight Today", "高亮今日"),

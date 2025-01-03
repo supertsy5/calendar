@@ -69,6 +69,9 @@ enum Dialog {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct ActiveDialog(Option<Dialog>);
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Toggle(bool);
+
 impl Reducible for YearMonth {
     type Action = YearMonthAction;
     fn reduce(self: Rc<Self>, action: Self::Action) -> std::rc::Rc<Self> {
@@ -143,25 +146,41 @@ impl Reducible for YearMonth {
 }
 
 impl Reducible for ActiveDialog {
-    type Action = Dialog;
+    type Action = Option<Dialog>;
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
-        if self.0 == Some(action) {
-            Rc::new(Self(None))
+        if let Some(action) = action {
+            if self.0 == Some(action) {
+                Rc::new(Self(None))
+            } else {
+                Rc::new(Self(Some(action)))
+            }
         } else {
-            Rc::new(Self(Some(action)))
+            Rc::new(Self(None))
         }
+    }
+}
+
+impl Reducible for Toggle {
+    type Action = ();
+    fn reduce(self: Rc<Self>, _action: Self::Action) -> Rc<Self> {
+        Rc::new(Self(!self.0))
     }
 }
 
 #[function_component(App)]
 pub fn app() -> Html {
     let today = chrono::Local::now().date_naive();
+    let is_mobile = web_sys::window()
+        .and_then(|window| window.inner_width().ok())
+        .and_then(|width| width.as_f64())
+        .is_some_and(|width| width < 768.0);
 
     let year_month = use_reducer_eq(|| YearMonth {
         year: today.year(),
         month: Month::try_from(today.month() as u8).unwrap(),
     });
     let active_dialog = use_reducer_eq(|| ActiveDialog(None));
+    let show_more = use_reducer_eq(|| Toggle(false));
 
     let color_text = use_state_eq(|| Rc::<str>::from("#111111"));
     let color_theme = use_state_eq(|| Rc::<str>::from("#0000ff"));
@@ -173,16 +192,22 @@ pub fn app() -> Html {
     let color_festival = use_state(|| Rc::<str>::from("inherit"));
     let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
     let font = use_state_eq(|| Rc::<str>::from("sans-serif"));
-    let size_cell_width = use_state_eq(|| Rc::<str>::from("96px"));
-    let size_cell_height = use_state_eq(|| Rc::<str>::from("96px"));
-    let size_header_height = use_state_eq(|| Rc::<str>::from("96px"));
-    let size_text = use_state_eq(|| Rc::<str>::from("24px"));
-    let size_text_year = use_state_eq(|| Rc::<str>::from("48px"));
-    let size_text_month = use_state_eq(|| Rc::<str>::from("32px"));
-    let size_text_weekday = use_state_eq(|| Rc::<str>::from("inherit"));
-    let size_text_week_number = use_state_eq(|| Rc::<str>::from("inherit"));
-    let size_text_chinese = use_state_eq(|| Rc::<str>::from("inherit"));
-    let size_year_margin = use_state_eq(|| Rc::<str>::from("64px"));
+    let size_cell_width = use_state_eq(|| Rc::<str>::from(if is_mobile { "48px" } else { "96px" }));
+    let size_cell_height =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "48px" } else { "96px" }));
+    let size_header_height =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "48px" } else { "96px" }));
+    let size_text = use_state_eq(|| Rc::<str>::from(if is_mobile { "16px" } else { "24px" }));
+    let size_text_year = use_state_eq(|| Rc::<str>::from(if is_mobile { "24px" } else { "48px" }));
+    let size_text_month = use_state_eq(|| Rc::<str>::from(if is_mobile { "16px" } else { "32px" }));
+    let size_text_weekday =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "8px" } else { "16px" }));
+    let size_text_week_number =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "8px" } else { "16px" }));
+    let size_text_chinese =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "8px" } else { "16px" }));
+    let size_year_margin =
+        use_state_eq(|| Rc::<str>::from(if is_mobile { "32px" } else { "64px" }));
 
     let language_index = use_state_eq(|| 0u32);
     let enable_chinese = use_state_eq(|| false);
@@ -241,6 +266,7 @@ pub fn app() -> Html {
     let active_dialog_dispatcher = active_dialog.dispatcher();
     let active_dialog_dispatcher1 = active_dialog.dispatcher();
     let active_dialog_dispatcher2 = active_dialog.dispatcher();
+    let active_dialog_dispatcher3 = active_dialog.dispatcher();
 
     let color_text_setter = color_text.setter();
     let color_theme_setter = color_theme.setter();
@@ -269,12 +295,14 @@ pub fn app() -> Html {
     let show_week_numbers_setter = show_week_numbers.setter();
     let highlight_today_setter = highlight_today.setter();
 
+    let show_more_dispatcher = show_more.dispatcher();
+
     html! { <>
-        if !css_import.is_empty() {
-            <style>{ css_import }</style>
-        }
-        <style>{
-            format!("
+            if !css_import.is_empty() {
+                <style>{ css_import }</style>
+            }
+            <style>{
+                format!("
             :root {{
                 --color-text: {color_text};
                 --color-theme: {color_theme};
@@ -295,10 +323,7 @@ pub fn app() -> Html {
                 --size-text-month: {size_text_month};
                 --size-text-year: {size_text_year};
                 --size-year-margin: {size_year_margin};
-            }}
-            
-            body {{
-                font-family: {font};
+                --font-family: {font};
             }}
             ",
             color_text = color_text.deref(),
@@ -625,44 +650,60 @@ pub fn app() -> Html {
                     "material-symbols-outlined",
                     (active_dialog_value == Some(Dialog::Jump)).then_some("active"),
                 ) }
-                onclick={ move |_| active_dialog_dispatcher.dispatch(Dialog::Jump) }
+                onclick={ move |_| active_dialog_dispatcher.dispatch(Some(Dialog::Jump)) }
             >
                 {"calendar_month"}
             </button>
-            <button
-                title={ translations::Print.static_translate(language) }
-                class="material-symbols-outlined"
-                onclick={ |_| {
-                    if let Some(window) = web_sys::window() {
-                        let _ = window.print();
-                    }
-                } }
-            >
-                {"print"}
-            </button>
-            <button
-                title={ translations::Styles.static_translate(language) }
-                class={ classes!(
-                    "material-symbols-outlined",
-                    (active_dialog_value == Some(Dialog::Styles)).then_some("active"),
-                ) }
-                onclick={ move |_| active_dialog_dispatcher1.dispatch(Dialog::Styles) }
-            >
-                {"style"}
-            </button>
+            <div class={ classes!("more", show_more.0.then_some("visible")) }>
+                <button
+                    title={ translations::Print.static_translate(language) }
+                    class="material-symbols-outlined"
+                    onclick={ |_| {
+                        if let Some(window) = web_sys::window() {
+                            let _ = window.print();
+                        }
+                    } }
+                >
+                    {"print"}
+                </button>
+                <button
+                    title={ translations::Styles.static_translate(language) }
+                    class={ classes!(
+                        "material-symbols-outlined",
+                        (active_dialog_value == Some(Dialog::Styles)).then_some("active"),
+                    ) }
+                    onclick={ move |_| active_dialog_dispatcher1.dispatch(Some(Dialog::Styles)) }
+                >
+                    {"style"}
+                </button>
+                <button
+                    title={ translations::Settings.static_translate(language) }
+                    class={ classes!(
+                        "material-symbols-outlined",
+                        (active_dialog_value == Some(Dialog::Settings)).then_some("active"),
+                    ) }
+                    onclick={ move |_| active_dialog_dispatcher2.dispatch(Some(Dialog::Settings)) }
+                >
+                    {"settings"}
+                </button>
+                <a href="https://github.com/supertsy5/calendar">
+                    <button title="GitHub" class="material-symbols-outlined">{"code"}</button>
+                </a>
+            </div>
             <button
                 title={ translations::Settings.static_translate(language) }
                 class={ classes!(
                     "material-symbols-outlined",
-                    (active_dialog_value == Some(Dialog::Settings)).then_some("active"),
+                    "button-more",
+                    show_more.0.then_some("active"),
                 ) }
-                onclick={ move |_| active_dialog_dispatcher2.dispatch(Dialog::Settings) }
+                onclick={ move |_| {
+                    active_dialog_dispatcher3.dispatch(None);
+                    show_more_dispatcher.dispatch(());
+                } }
             >
-                {"settings"}
+                {"more_horiz"}
             </button>
-            <a href="https://github.com/supertsy5/calendar">
-                <button title="GitHub" class="material-symbols-outlined">{"code"}</button>
-            </a>
         </div>
     </>}
 }
