@@ -378,6 +378,8 @@ pub fn app() -> Html {
                                                             .short()
                                                             .translate_to_string(language)
                                                     }</div>
+                                                } else if *enable_chinese {
+                                                    <div class="chinese"></div>
                                                 }
                                             </td>
                                         } else {
