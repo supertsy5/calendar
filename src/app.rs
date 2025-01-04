@@ -215,6 +215,8 @@ pub fn app() -> Html {
     let show_week_numbers = use_state_eq(|| false);
     let highlight_today = use_state_eq(|| true);
 
+    let show_today_button =
+        today.year() != year_month.year || today.month() != year_month.month.number_from_month();
     let language = LANGUAGES
         .get(*language_index as usize)
         .copied()
@@ -615,6 +617,15 @@ pub fn app() -> Html {
             } }
         }
         <div class="corner-buttons">
+            if show_today_button {
+                <button
+                    title={ translations::Today.static_translate(language) }
+                    class="material-symbols-outlined"
+                    onclick={ move |_| year_month_dispatcher2.dispatch(YearMonthAction::Today) }
+                >
+                    {"today"}
+                </button>
+            }
             <button
                 title={ translations::PrevMonth.static_translate(language) }
                 class="material-symbols-outlined"
@@ -636,13 +647,6 @@ pub fn app() -> Html {
                 onclick={ move |_| year_month_dispatcher1.dispatch(YearMonthAction::NextMonth) }
             >
                 {"arrow_forward"}
-            </button>
-            <button
-                title={ translations::Today.static_translate(language) }
-                class="material-symbols-outlined"
-                onclick={ move |_| year_month_dispatcher2.dispatch(YearMonthAction::Today) }
-            >
-                {"today"}
             </button>
             <button
                 title={ translations::Jump.static_translate(language) }
