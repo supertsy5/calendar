@@ -192,6 +192,7 @@ pub fn app() -> Html {
     let color_festival = use_state(|| Rc::<str>::from("inherit"));
     let color_solar_term = use_state_eq(|| Rc::<str>::from("inherit"));
     let font = use_state_eq(|| Rc::<str>::from("sans-serif"));
+    let download_fonts = use_state_eq(|| true);
     let size_cell_width = use_state_eq(|| Rc::<str>::from(if is_mobile { "48px" } else { "96px" }));
     let size_cell_height =
         use_state_eq(|| Rc::<str>::from(if is_mobile { "48px" } else { "96px" }));
@@ -240,23 +241,29 @@ pub fn app() -> Html {
             .unwrap()
         },
     );
-    let css_import = use_memo(font.deref().clone(), |font| {
-        let fonts = font
-            .split(',')
-            .map(|s| s.trim().trim_matches('"'))
-            .filter(|s| !GENERIC_FONTS.contains(&s.to_lowercase().as_str()))
-            .flat_map(|s| {
-                "&family="
-                    .chars()
-                    .chain(s.chars().map(|ch| if ch == ' ' { '+' } else { ch }))
-            })
-            .collect::<String>();
-        if fonts.is_empty() {
-            String::new()
-        } else {
-            format!("@import url(\"https://fonts.googleapis.com/css2?display=swap{fonts}\");")
-        }
-    });
+    let css_import = use_memo(
+        (font.deref().clone(), *download_fonts),
+        |(font, download_fonts)| {
+            if !download_fonts {
+                return String::new();
+            }
+            let fonts = font
+                .split(',')
+                .map(|s| s.trim().trim_matches('"'))
+                .filter(|s| !GENERIC_FONTS.contains(&s.to_lowercase().as_str()))
+                .flat_map(|s| {
+                    "&family="
+                        .chars()
+                        .chain(s.chars().map(|ch| if ch == ' ' { '+' } else { ch }))
+                })
+                .collect::<String>();
+            if fonts.is_empty() {
+                String::new()
+            } else {
+                format!("@import url(\"https://fonts.googleapis.com/css2?display=swap{fonts}\");")
+            }
+        },
+    );
 
     let active_dialog_value = active_dialog.0;
 
@@ -280,6 +287,7 @@ pub fn app() -> Html {
     let color_festival_setter = color_festival.setter();
     let color_solar_term_setter = color_solar_term.setter();
     let font_setter = font.setter();
+    let download_fonts_setter = download_fonts.setter();
     let size_cell_width_setter = size_cell_width.setter();
     let size_cell_height_setter = size_cell_height.setter();
     let size_header_height_setter = size_header_height.setter();
@@ -515,6 +523,14 @@ pub fn app() -> Html {
                             name={ translations::Font.static_translate(language) }
                             value={ font.deref().clone() }
                             onchange={ move |value| font_setter.set(Rc::from(value)) }
+                        />
+                        <CheckboxInput
+                            name={
+                                translations::DownloadFontsAutomatically
+                                .static_translate(language)
+                            }
+                            checked={ *download_fonts }
+                            onchange={ move |checked| download_fonts_setter.set(checked) }
                         />
                         <StringInput
                             name={ translations::CellWidth.static_translate(language) }

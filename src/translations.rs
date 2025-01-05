@@ -6,7 +6,7 @@ use nongli::language::{
 };
 
 macro_rules! translate {
-    ($(($ident: ident, $en: literal, $ch: literal)),* $(,)?) => {
+    ($(($ident: ident, $en: literal, $ch: literal $(,)?)),* $(,)?) => {
         $(
             #[derive(Clone, Copy, Debug, PartialEq, Eq)]
             pub struct $ident;
@@ -28,7 +28,7 @@ macro_rules! translate {
         )*
     };
 
-    ($(($ident: ident, $en: literal, $ch_s: literal, $ch_t: literal)),* $(,)?) => {
+    ($(($ident: ident, $en: literal, $ch_s: literal, $ch_t: literal $(,)?)),* $(,)?) => {
         $(
             #[derive(Clone, Copy, Debug, PartialEq, Eq)]
             pub struct $ident;
@@ -71,24 +71,55 @@ translate!(
     (ThemeColor, "Theme Color", "主题颜色", "主題顏色"),
     (YearColor, "Year Color", "年颜色", "年顏色"),
     (MonthColor, "Month Color", "月颜色", "月顏色"),
-    (TodayTextColor, "Today Text Color", "今日文字颜色", "今日文字顏色"),
+    (
+        TodayTextColor,
+        "Today Text Color",
+        "今日文字颜色",
+        "今日文字顏色"
+    ),
     (WeekendColor, "Weekend Color", "周末颜色", "週末顏色"),
     (WeekNumberColor, "Week Number Color", "周数颜色", "週數顏色"),
     (FestivalColor, "Festival Color", "节日颜色", "節日顏色"),
     (SolarTermColor, "Solar Term Color", "节气颜色", "節氣顏色"),
     (Font, "Font", "字体", "字體"),
+    (
+        DownloadFontsAutomatically,
+        "Download Fonts from Google Automatically",
+        "自动从Google下载字体",
+        "自動從Google下載字體",
+    ),
     (CellWidth, "Cell Width", "单元格宽度", "單元格寬度"),
     (CellHeight, "Cell Height", "单元格高度", "單元格高度"),
     (HeaderHeight, "Header Height", "标题高度", "標題高度"),
     (YearMargin, "Year Margin", "年边距", "年邊距"),
     (TextSize, "Text Size", "字号", "字號"),
     (WeekdayTextSize, "Weekday Text Size", "星期字号", "星期字號"),
-    (WeekNumberTextSize, "Week Number Text Size", "周数字号", "週數字號"),
-    (ChineseTextSize, "Chinese Date Text Size", "农历字号", "農曆字號"),
+    (
+        WeekNumberTextSize,
+        "Week Number Text Size",
+        "周数字号",
+        "週數字號"
+    ),
+    (
+        ChineseTextSize,
+        "Chinese Date Text Size",
+        "农历字号",
+        "農曆字號"
+    ),
     (YearTextSize, "Year Text Size", "年字号", "年字號"),
     (MonthTextSize, "Month Text Size", "月字号", "月字號"),
     (Language, "Language", "语言", "語言"),
-    (EnableChineseCalendar, "Enable Chinese Calendar", "启用农历", "啟用農曆"),
-    (StartOnMonday, "Start on Monday", "从星期一开始", "從星期一開始"),
+    (
+        EnableChineseCalendar,
+        "Enable Chinese Calendar",
+        "启用农历",
+        "啟用農曆"
+    ),
+    (
+        StartOnMonday,
+        "Start on Monday",
+        "从星期一开始",
+        "從星期一開始"
+    ),
     (ShowWeekNumbers, "Show Week Numbers", "显示周数", "顯示週數"),
 );
