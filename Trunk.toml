@@ -1,2 +1,2 @@
 [build]
-public_url = "dist/"
+public_url = "/calendar/dist/"
