@@ -2,7 +2,7 @@
 
 A customizable and printable calendar supporting Chinese Calendar
 
-<https://supertsy5.github.io/calendar>
+<https://supertsy5.github.io/calendar/dist>
 
 ## Development
 
