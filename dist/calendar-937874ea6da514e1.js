@@ -231,7 +231,7 @@ function debugString(val) {
     return className;
 }
 function __wbg_adapter_24(arg0, arg1, arg2) {
-    wasm.closure545_externref_shim(arg0, arg1, arg2);
+    wasm.closure549_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_27(arg0, arg1, arg2) {
@@ -613,11 +613,11 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper4364 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 546, __wbg_adapter_24);
+    imports.wbg.__wbindgen_closure_wrapper5069 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 550, __wbg_adapter_24);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper6005 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper6041 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 638, __wbg_adapter_27);
         return ret;
     };
@@ -720,7 +720,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('calendar-210df1773ea6964a02f2c713f1879746762a6819d77a86281834ec99d114742e3cc9c9f6de570de2e232959bdacf7711_bg.wasm', import.meta.url);
+        module_or_path = new URL('calendar_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
