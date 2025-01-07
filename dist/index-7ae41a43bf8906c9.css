@@ -1,0 +1,166 @@
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+body {
+  align-items: center;
+  display: flex;
+  color: var(--color-text);
+  flex-direction: column;
+  font-family: var(--font-family);
+  margin: 0px;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+}
+
+div.header {
+  align-items: center;
+  display: flex;
+  height: var(--size-header-height);
+  justify-content: center;
+}
+div.header div.year {
+  color: var(--color-year);
+  font-size: var(--size-text-year);
+  margin: 0px var(--size-year-margin);
+}
+div.header div.side {
+  color: var(--color-month);
+  flex: 1 0 0;
+  font-size: var(--size-text-month);
+}
+div.header div.side.left {
+  text-align: right;
+}
+
+table.calendar {
+  border-collapse: collapse;
+}
+table.calendar th {
+  font-weight: normal;
+}
+table.calendar th.week-number {
+  font-size: var(--size-text-week-number);
+  color: var(--color-week-number);
+}
+table.calendar th.weekday {
+  font-size: var(--size-text-weekday);
+}
+table.calendar th.weekday.weekend {
+  color: var(--color-weekend);
+}
+table.calendar td {
+  height: var(--size-cell-height);
+  text-align: center;
+  width: var(--size-cell-width);
+}
+table.calendar td.weekend {
+  color: var(--color-weekend);
+}
+table.calendar td.today {
+  background-color: var(--color-theme);
+  border-radius: var(--size-today-border-radius);
+  color: var(--color-today-text);
+}
+table.calendar td div.day {
+  font-size: var(--size-text);
+  vertical-align: bottom;
+}
+table.calendar td div.chinese {
+  font-size: var(--size-text-chinese);
+  height: 1lh;
+}
+table.calendar td div.chinese.festival {
+  color: var(--color-festival);
+}
+table.calendar td div.chinese.solar-term {
+  color: var(--color-solar-term);
+}
+
+div.corner-buttons {
+  bottom: 16px;
+  position: fixed;
+  right: 16px;
+}
+div.corner-buttons button {
+  color: rgba(0, 0, 0, 0.5019607843);
+  height: 48px;
+  width: 48px;
+}
+div.corner-buttons button.active {
+  color: var(--color-theme);
+}
+
+div.dialog {
+  background-color: white;
+  bottom: 64px;
+  border: 1px solid gray;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100svh - 80px);
+  max-width: calc(100svw - 80px);
+  padding: 8px;
+  position: fixed;
+  right: 16px;
+  z-index: 256;
+}
+div.dialog input {
+  font-family: monospace;
+}
+div.dialog div.title {
+  font-weight: bold;
+  text-align: center;
+}
+div.dialog div.form {
+  overflow: auto;
+}
+div.dialog td:first-child {
+  white-space: nowrap;
+}
+div.dialog td:last-child {
+  text-align: right;
+}
+
+@media print {
+  div:is(.corner-buttons, .dialog) {
+    display: none;
+  }
+}
+@media (min-width: 416px) {
+  button.button-more {
+    display: none;
+  }
+  div.more {
+    display: inline-block;
+  }
+}
+@media (max-width: 415px) {
+  div.dialog {
+    right: 64px;
+  }
+  div.more {
+    bottom: 48px;
+    position: absolute;
+    right: 0px;
+    width: 48px;
+  }
+  div.more:not(.visible) {
+    display: none;
+  }
+  div.more button::before {
+    content: attr(title);
+    font-size: initial;
+    font-family: var(--font-family);
+    padding: 4px;
+    position: absolute;
+    right: 48px;
+  }
+}
