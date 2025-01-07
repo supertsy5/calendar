@@ -1,6 +1,6 @@
 # Calendar
 
-a customizable and printable calendar supporting Chinese Calendar
+A customizable and printable calendar supporting Chinese Calendar
 
 <https://supertsy5.github.io/calendar>
 
