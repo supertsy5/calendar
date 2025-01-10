@@ -1,6 +1,6 @@
 [package]
 name = "calendar"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A customizable and printable calendar supporting Chinese Calendar"
 readme = "README.md"
@@ -10,6 +10,6 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 chrono = "^0.4.39"
-nongli = "^0.4.0"
+nongli = "^0.4.1"
 web-sys = { version = "^0.3.76", features = ["HtmlSelectElement"] }
 yew = { version = "^0.21", features = ["csr"] }

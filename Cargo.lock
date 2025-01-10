@@ -88,7 +88,7 @@ checksum = "325918d6fe32f23b19878fe4b34794ae41fc19ddbe53b10571a4874d44ffd39b"
 
 [[package]]
 name = "calendar"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "nongli",
@@ -727,9 +727,9 @@ dependencies = [
 
 [[package]]
 name = "nongli"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e66579e84c0b922ae0d33134f7f4e4910709f63f21dac6b28dc8eabe1dd8079"
+checksum = "200dc2148c36ff40698321054c1eda690b638d7e9c8f6fd3879601f2ba86a934"
 dependencies = [
  "chrono",
 ]
